@@ -1,5 +1,5 @@
 'use client';
-
+ 
 import { lusitana } from '@/app/ui/fonts';
 import {
   AtSymbolIcon,
@@ -8,34 +8,17 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '@/app/ui/button';
-import { useState } from 'react';
+import { useFormState } from 'react-dom';
 import { authenticate } from '@/app/lib/actions';
-
+ 
 export default function LoginForm() {
-  const [errorMessage, setErrorMessage] = useState("");
-  const [isPending, setIsPending] = useState(false);
-
-  const handleSubmit = async (event:any) => {
-    event.preventDefault();
-    setIsPending(true);
-    setErrorMessage("");
-
-    const formData = new FormData(event.target);
-
-    try {
-      const result = await authenticate(undefined, formData); // Provide prevState as undefined and formData
-      if (result) {
-        setErrorMessage(result);
-      }
-    } catch (error) {
-      setErrorMessage('An unexpected error occurred.');
-    } finally {
-      setIsPending(false);
-    }
-  };
-
+  const [errorMessage, formAction] = useFormState(
+    authenticate,
+    undefined,
+  );
+ 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
+    <form action={formAction} className="space-y-3">
       <div className="flex-1 rounded-lg bg-gray-50 px-6 pb-4 pt-8">
         <h1 className={`${lusitana.className} mb-3 text-2xl`}>
           Please log in to continue.
@@ -81,7 +64,7 @@ export default function LoginForm() {
             </div>
           </div>
         </div>
-        <Button className="mt-4 w-full" aria-disabled={isPending} disabled={isPending}>
+        <Button className="mt-4 w-full">
           Log in <ArrowRightIcon className="ml-auto h-5 w-5 text-gray-50" />
         </Button>
         <div
